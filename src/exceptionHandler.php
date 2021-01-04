@@ -16,5 +16,7 @@ class exceptionHandler
         echo $this->exception->getMessage();
         echo PHP_EOL;
         echo $this->exception->getCode();
+        echo "<pre>";
+        print_r($this->exception->getTrace());
     }
 }

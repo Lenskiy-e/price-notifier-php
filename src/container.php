@@ -19,52 +19,57 @@ class container
     
     public function run()
     {
-        $this->loadServices($this->basePath);
+        $this->loadServices($this->basePath, 'App\\');
     }
     
-    private function loadServices(string $path)
+    public function loadServices(string $path, string $prefix = '')
     {
         $objects = new \DirectoryIterator($path);
 
-        foreach ($objects as $object) {
+        foreach ($objects as /** @var \DirectoryIterator $object */$object) {
             if($object->isDir() && !$object->isDot()) {
-                $this->loadServices($object->getPathname());
+                $this->loadServices($object->getPathname(), $prefix);
             }
 
-            if($objects->isFile() && $object->getPath() !== __DIR__) {
-                $path = str_replace("{$this->basePath}/", '',$object->getPath());
-                $pathToClass = "App\\{$path}\\{$object->getBasename('.php')}";
+            if($object->isFile() && $object->getExtension() === 'php' &&$object->getPath() !== __DIR__) {
+                $namespacePath = explode('/',"{$this->basePath}/{$object->getPath()}");
+                $path = implode('\\',preg_grep('~^[A-Z].*~', $namespacePath));
+                $pathToClass = "{$prefix}{$path}\\{$object->getBasename('.php')}";
+
                 $serviceParameters = [];
 
-                $class = new \ReflectionClass( str_replace('/', '\\', $pathToClass) );
-                $serviceName = $class->getName();
-
-                $constructor = $class->getConstructor();
-
-                if($constructor) {
-                    foreach ($constructor->getParameters() as $argument) {
-                        $type = (string)$argument->getType();
-                        if ( $this->hasService($type) ) {
-                            $serviceParameters[] = $this->getService($type);
-                        }
-
-                        if( !$this->hasService($type) ) {
-                            $serviceParameters[] = function () use($type){
-                                return $this->getService($type);
-                            };
+                if(class_exists(str_replace('/', '\\', $pathToClass))) {
+                    $class = new \ReflectionClass( str_replace('/', '\\', $pathToClass) );
+                    $serviceName = $class->getName();
+    
+                    $constructor = $class->getConstructor();
+    
+                    if($constructor) {
+                        foreach ($constructor->getParameters() as $argument) {
+                            $type = (string)$argument->getType();
+                            if ( $this->hasService($type) ) {
+                                $serviceParameters[] = $this->getService($type);
+                            }
+            
+                            if( !$this->hasService($type) ) {
+                                $serviceParameters[] = function () use($type){
+                                    return $this->getService($type);
+                                };
+                            }
                         }
                     }
+    
+                    $this->addService($serviceName, function() use($serviceName,$serviceParameters){
+                        foreach ($serviceParameters as &$serviceParameter) {
+                            if($serviceParameter instanceof \Closure) {
+                                $serviceParameter = $serviceParameter();
+                            }
+                        }
+        
+                        return new $serviceName(...$serviceParameters);
+                    });
                 }
 
-                $this->addService($serviceName, function() use($serviceName,$serviceParameters){
-                    foreach ($serviceParameters as &$serviceParameter) {
-                        if($serviceParameter instanceof \Closure) {
-                            $serviceParameter = $serviceParameter();
-                        }
-                    }
-
-                    return new $serviceName(...$serviceParameters);
-                });
             }
         }
     }
@@ -92,7 +97,7 @@ class container
         return isset($this->services[$service]);
     }
     
-    private function addService(string $name, \Closure $closure)
+    public function addService(string $name, \Closure $closure)
     {
         if(!$this->hasService($name)) {
             $this->services[$name] = $closure;

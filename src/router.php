@@ -28,6 +28,13 @@ class router
     
     public function getParameters() : array
     {
-        return array_splice($this->path, 2);
+        $result = array_splice($this->path, 2);
+        
+        foreach ($result as &$item) {
+            if(is_numeric($item)) {
+                $item = (int)$item;
+            }
+        }
+        return $result;
     }
 }

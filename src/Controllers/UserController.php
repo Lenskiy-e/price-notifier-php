@@ -3,22 +3,30 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Models\User;
+use App\Models\user;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class UserController
 {
     /**
-     * @var User
+     * @var user
      */
     private $model;
+    /**
+     * @var EntityManagerInterface
+     */
+    private $userRepository;
     
     /**
      * UserController constructor.
-     * @param User $model
+     * @param user $model
+     * @param UserRepository $userRepository
      */
-    public function __construct(User $model)
+    public function __construct(user $model, UserRepository $userRepository)
     {
         $this->model = $model;
+        $this->userRepository = $userRepository;
     }
     
     public function actionIndex()
@@ -28,6 +36,6 @@ class UserController
     
     public function actionGet(int $id)
     {
-        echo $id;
+        var_dump($this->userRepository->findById($id));
     }
 }
