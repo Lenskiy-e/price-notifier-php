@@ -11,6 +11,10 @@ use Doctrine\ORM\Tools\Setup;
 
 class bootstrap
 {
+    /**
+     * @param array $server
+     * @throws NotFoundException
+     */
     public function run(array $server)
     {
         $container = $this->loadContainer();
@@ -31,6 +35,10 @@ class bootstrap
         $controller->$action(...$router->getParameters());
     }
     
+    /**
+     * @return EntityManager
+     * @throws \Doctrine\ORM\ORMException
+     */
     public function configOrm(): EntityManager
     {
         if(!getenv('db_adapter')) {
@@ -50,6 +58,9 @@ class bootstrap
         return EntityManager::create($params, $config);
     }
     
+    /**
+     * @return container
+     */
     private function loadContainer() : container
     {
         $container = new container();
@@ -61,6 +72,9 @@ class bootstrap
         return $container;
     }
     
+    /**
+     *
+     */
     private function loadEnv()
     {
         $path = __DIR__ . '/../.env';

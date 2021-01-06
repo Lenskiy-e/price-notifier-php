@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping\Id;
  * @package App\Models
  * @Entity()
  */
-class product
+class Product
 {
     /**
      * @Id
@@ -24,9 +24,19 @@ class product
     private $id;
     
     /**
-     * @ORM\Column(type="string")
+     * @Column(type="string")
      */
     private $name;
+    
+    /**
+     * @Column(type="boolean")
+     */
+    private $active;
+    
+    public function __construct()
+    {
+        $this->active = true;
+    }
     
     /**
      * @return mixed
@@ -50,6 +60,22 @@ class product
     public function setName($name)
     {
         $this->name = $name;
+    }
+    
+    /**
+     * @return mixed
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+    
+    /**
+     * @param mixed $active
+     */
+    public function setActive($active): void
+    {
+        $this->active = $active;
     }
     
     

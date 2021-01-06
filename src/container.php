@@ -3,25 +3,43 @@ declare(strict_types=1);
 
 namespace App;
 
+/**
+ * Class container
+ * @package App
+ */
 class container
 {
+    /**
+     * @var array
+     */
     private $services;
     /**
      * @var string
      */
     private $basePath;
     
+    /**
+     * container constructor.
+     */
     public function __construct()
     {
         $this->basePath = __DIR__;
         $this->services = [];
     }
     
+    /**
+     *
+     */
     public function run()
     {
         $this->loadServices($this->basePath, 'App\\');
     }
     
+    /**
+     * @param string $path
+     * @param string $prefix
+     * @throws \ReflectionException
+     */
     public function loadServices(string $path, string $prefix = '')
     {
         $objects = new \DirectoryIterator($path);
@@ -74,11 +92,18 @@ class container
         }
     }
     
+    /**
+     * @return array
+     */
     public function getServices(): array
     {
         return $this->services;
     }
     
+    /**
+     * @param string $name
+     * @return mixed|null
+     */
     public function getService(string $name)
     {
         if (!$this->hasService($name)) {
@@ -92,11 +117,19 @@ class container
         return $this->services[$name];
     }
     
+    /**
+     * @param $service
+     * @return bool
+     */
     private function hasService($service) : bool
     {
         return isset($this->services[$service]);
     }
     
+    /**
+     * @param string $name
+     * @param \Closure $closure
+     */
     public function addService(string $name, \Closure $closure)
     {
         if(!$this->hasService($name)) {

@@ -4,8 +4,15 @@ namespace App;
 
 class exceptionHandler
 {
+    /**
+     * @var
+     */
     private $exception;
     
+    /**
+     * exceptionHandler constructor.
+     * @param $exception
+     */
     public function __construct($exception)
     {
         $this->exception = $exception;
