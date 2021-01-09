@@ -6,8 +6,10 @@ namespace App;
 use App\Exception\NotFoundException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Setup;
+use \Swift_Mailer;
+use \Swift_SmtpTransport;
+use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerTransportFactory;
 
 class bootstrap
 {
@@ -17,9 +19,9 @@ class bootstrap
      */
     public function run(array $server)
     {
+        $this->loadEnv();
         $container = $this->loadContainer();
         $router = new router($server['REQUEST_URI']);
-        $this->loadEnv();
         
         $controller = $container->getService("App\\Controllers\\{$router->getController()}");
         $action = $router->getAction();
@@ -64,9 +66,19 @@ class bootstrap
     private function loadContainer() : container
     {
         $container = new container();
+        
         $container->addService(EntityManagerInterface::class, function(){
             return $this->configOrm() instanceof EntityManagerInterface ? $this->configOrm() : null;
         });
+        
+        $container->addService(Swift_SmtpTransport::class, function (){
+            return new Swift_SmtpTransport( getenv('mailer_dns'),getenv('mailer_port') );
+        });
+
+        $container->addService(Swift_Mailer::class, function () use($container){
+            return new Swift_Mailer( $container->getService(Swift_SmtpTransport::class) );
+        });
+        
         $container->run();
         
         return $container;

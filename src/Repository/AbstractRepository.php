@@ -19,13 +19,18 @@ class AbstractRepository
     protected $entity;
     
     /**
+     * @var \Doctrine\ORM\QueryBuilder
+     */
+    protected $qb;
+    
+    /**
      * AbstractRepository constructor.
      * @param EntityManagerInterface $manager
      */
     public function __construct(EntityManagerInterface $manager)
     {
-    
         $this->manager = $manager;
+        $this->qb = $manager->createQueryBuilder();
     }
     
     public function findById($id)

@@ -10,9 +10,9 @@ use Doctrine\ORM\Mapping\Table;
 
 /**
  * @Entity()
- * @Table(name="`user`")
+ * @Table(name="users")
  */
-class User
+class Users
 {
     /**
      * @Id

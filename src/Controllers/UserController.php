@@ -7,11 +7,12 @@ use App\DTO\CreateUserDTO;
 use App\DTO\UpdateUserDTO;
 use App\Exception\DTOException;
 use App\Exception\NotFoundException;
-use App\Models\User;
+use App\Models\Users;
 use App\Repository\UserRepository;
 use App\Services\Request;
 use App\Services\UserService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\NoResultException;
 
 class UserController extends AbstractController
 {
@@ -41,7 +42,7 @@ class UserController extends AbstractController
      * @param UserService $userService
      */
     public function __construct(
-        User $model,
+        Users $model,
         UserRepository $userRepository,
         Request $request,
         UserService $userService
@@ -73,7 +74,7 @@ class UserController extends AbstractController
             $this->userService->create($dto);
             $this->response([
                 'status'    => 'success',
-                'message'   => 'User successfully created, check your email to receive the login token'
+                'message'   => 'Users successfully created, check your email to receive the login token'
             ],201);
         }catch (DTOException $e) {
             $this->response([
@@ -134,6 +135,26 @@ class UserController extends AbstractController
             ],200);
         }catch(NotFoundException $e){
             $this->returnNotFound($e->getMessage());
+        }catch (\Exception $e) {
+            $this->response([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function actionLogin()
+    {
+        try {
+            $this->checkMethod('post');
+            
+            if(!$this->request->has('email')) {
+                $this->returnNotFound('Email not found');
+            }
+            
+            $this->userService->login( $this->request->get('email') );
+        }catch(NotFoundException|NoResultException $e){
+            $this->returnNotFound('User not found');
         }catch (\Exception $e) {
             $this->response([
                 'status' => 'error',
