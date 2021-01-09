@@ -24,7 +24,7 @@ class router
      */
     public function getController(): string
     {
-        $controller = ucfirst( strtolower( $this->path[0] ) );
+        $controller = ucfirst( strtolower( strlen($this->path[0]) ? $this->path[0] : 'home' ) );
         return "{$controller}Controller";
     }
     

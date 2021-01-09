@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 
-class TokenGenerator
+class Generator
 {
     private const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     

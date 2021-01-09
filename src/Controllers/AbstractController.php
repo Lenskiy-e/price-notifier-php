@@ -46,4 +46,11 @@ class AbstractController
             $this->returnNotFound();
         }
     }
+    
+    protected function redirect(string $url, int $code = 301)
+    {
+        http_response_code($code);
+        header("Location: {$url}");
+        exit();
+    }
 }

@@ -162,4 +162,27 @@ class UserController extends AbstractController
             ], 500);
         }
     }
+    
+    public function actionAuth(?string $token = null)
+    {
+        try {
+            $this->checkMethod('get');
+            
+            if(!$token) {
+                throw new NotFoundException();
+            }
+            
+            if($this->userService->auth($token)) {
+                $this->redirect('/');
+            }
+            
+        }catch(NotFoundException|NoResultException $e){
+            $this->returnNotFound('Token not found');
+        }catch (\Exception $e) {
+            $this->response([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

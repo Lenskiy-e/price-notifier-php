@@ -4,12 +4,16 @@ declare(strict_types=1);
 namespace App;
 
 use App\Exception\NotFoundException;
+use App\Exception\UnauthorizedException;
+use App\Security\MailTokenSecurity;
+use App\Security\SecurityInterface;
+use App\Services\Cookie;
+use App\Services\Session;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Setup;
 use \Swift_Mailer;
 use \Swift_SmtpTransport;
-use Symfony\Bundle\SwiftmailerBundle\DependencyInjection\SwiftmailerTransportFactory;
 
 class bootstrap
 {
@@ -19,9 +23,20 @@ class bootstrap
      */
     public function run(array $server)
     {
+        session_start();
         $this->loadEnv();
         $container = $this->loadContainer();
         $router = new router($server['REQUEST_URI']);
+    
+        if(getenv('check_security')) {
+            /**
+             * @var SecurityInterface $security
+             */
+            $security = $container->getService(SecurityInterface::class);
+            if(!$security->isAuthenticated()) {
+                throw new UnauthorizedException('Need to authenticate!');
+            }
+        }
         
         $controller = $container->getService("App\\Controllers\\{$router->getController()}");
         $action = $router->getAction();
@@ -77,6 +92,14 @@ class bootstrap
 
         $container->addService(Swift_Mailer::class, function () use($container){
             return new Swift_Mailer( $container->getService(Swift_SmtpTransport::class) );
+        });
+        
+        $container->addService(SecurityInterface::class, function () use ($container){
+            $security = new MailTokenSecurity(
+                $container->getService(Cookie::class),
+                $container->getService(Session::class)
+            );
+            return $security instanceof SecurityInterface ? $security : null;
         });
         
         $container->run();

@@ -18,7 +18,7 @@ class UserService
      */
     private $entityManager;
     /**
-     * @var TokenGenerator
+     * @var Generator
      */
     private $generator;
     /**
@@ -29,20 +29,44 @@ class UserService
      * @var \Swift_Mailer
      */
     private $mailer;
+    /**
+     * @var Session
+     */
+    private $session;
+    /**
+     * @var Cookie
+     */
+    private $cookie;
     
+    /**
+     * UserService constructor.
+     * @param EntityManagerInterface $entityManager
+     * @param Generator $generator
+     * @param UserRepository $userRepository
+     * @param \Swift_Mailer $mailer
+     * @param Session $session
+     * @param Cookie $cookie
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
-        TokenGenerator $generator,
+        Generator $generator,
         UserRepository $userRepository,
-        \Swift_Mailer $mailer
+        \Swift_Mailer $mailer,
+        Session $session,
+        Cookie $cookie
     )
     {
         $this->entityManager = $entityManager;
         $this->generator = $generator;
         $this->userRepository = $userRepository;
         $this->mailer = $mailer;
+        $this->session = $session;
+        $this->cookie = $cookie;
     }
     
+    /**
+     * @param CreateUserDTO $dto
+     */
     public function create(CreateUserDTO $dto) : void
     {
         $user = new Users();
@@ -56,6 +80,11 @@ class UserService
         $this->entityManager->flush();
     }
     
+    /**
+     * @param UpdateUserDTO $dto
+     * @param int $id
+     * @throws NotFoundException
+     */
     public function update(UpdateUserDTO $dto, int $id) : void
     {
         $user = $this->userRepository->findById($id);
@@ -74,6 +103,10 @@ class UserService
         $this->entityManager->flush();
     }
     
+    /**
+     * @param int $id
+     * @throws NotFoundException
+     */
     public function delete(int $id)
     {
         $user = $this->userRepository->findById($id);
@@ -86,6 +119,12 @@ class UserService
         $this->entityManager->flush();
     }
     
+    /**
+     * @param string $email
+     * @param string|null $token
+     * @return int
+     * @throws NotFoundException
+     */
     public function login(string $email, ?string $token = null)
     {
         if(!$token) {
@@ -94,13 +133,20 @@ class UserService
         /**
          * @var Users $user
          */
-        $user = $this->userRepository->findByEmail($email);
+        $user = $this->userRepository->findOneBy([
+            'email' => $email
+        ]);
         
         if(!$user) {
             throw new NotFoundException();
         }
         
         $user->setLoginToken($token);
+        $user->setSecurityToken('');
+        
+        $this->session->remove('user');
+        $this->cookie->remove('token');
+        
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         
@@ -111,8 +157,38 @@ class UserService
             ->setTo($email)
             ->setContentType("text/html")
             ->setBody(
-                "To login click <a href='http://localhost/auth/{$token}'>here</a>"
+                "To login click <a href='http://localhost/user/auth/{$token}'>here</a>"
             );
         return $this->mailer->send($message);
+    }
+    
+    /**
+     * @param string $token
+     * @return bool
+     */
+    public function auth(string $token) : bool
+    {
+        /**
+         * @var Users $user
+         */
+        $user = $this->userRepository->findOneBy([
+            'login_token' => $token
+        ]);
+        
+        if(!$user) {
+            throw new NotFoundException();
+        }
+        
+        $token = $this->generator->generate(50, $user->getEmail());
+        
+        $user->setSecurityToken($token);
+        $user->setLoginToken('');
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+        
+        $this->cookie->set('token', password_hash($token,PASSWORD_BCRYPT));
+        $this->session->set('user', $user);
+
+        return true;
     }
 }
