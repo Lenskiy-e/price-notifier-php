@@ -38,8 +38,8 @@ class MailTokenSecurity implements SecurityInterface
     private function validate() : bool
     {
         foreach (self::NON_VALIDATE_URLS as $url) {
-            $pattern = '~^' . preg_replace('~^(.*)(\{[a-zA-Z]+\})(.*)$~', '$1[a-zA-Z0-9\=]+', $url) . '$~';
-  
+            $pattern = '~^' . preg_replace('~\{[a-zA-Z]+\}~', '[a-zA-Z0-9\=]+', $url) . '$~';
+
             if(preg_match($pattern, $_SERVER['REQUEST_URI'])) {
                 return true;
             }
