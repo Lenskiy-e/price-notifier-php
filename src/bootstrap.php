@@ -5,7 +5,8 @@ namespace App;
 
 use App\Exception\NotFoundException;
 use App\Exception\UnauthorizedException;
-use App\Security\MailTokenSecurity;
+use App\Repository\UserRepository;
+use App\Security\CookieTokenSecurity;
 use App\Security\SecurityInterface;
 use App\Services\Cookie;
 use App\Services\Session;
@@ -95,9 +96,10 @@ class bootstrap
         });
         
         $container->addService(SecurityInterface::class, function () use ($container){
-            $security = new MailTokenSecurity(
+            $security = new CookieTokenSecurity(
                 $container->getService(Cookie::class),
-                $container->getService(Session::class)
+                $container->getService(Session::class),
+                $container->getService(UserRepository::class)
             );
             return $security instanceof SecurityInterface ? $security : null;
         });

@@ -12,11 +12,7 @@ class AbstractController
      */
     private $request;
     
-    /**
-     * AbstractController constructor.
-     * @param Request $request
-     */
-    protected function setRequest(Request $request)
+    public function __construct(Request $request)
     {
         $this->request = $request;
     }

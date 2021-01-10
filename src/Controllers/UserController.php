@@ -12,6 +12,7 @@ use App\Repository\UserRepository;
 use App\Services\Request;
 use App\Services\UserService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
 
 class UserController extends AbstractController
@@ -36,7 +37,7 @@ class UserController extends AbstractController
     
     /**
      * UserController constructor.
-     * @param User $model
+     * @param Users $model
      * @param UserRepository $userRepository
      * @param Request $request
      * @param UserService $userService
@@ -53,7 +54,7 @@ class UserController extends AbstractController
         $this->request = $request;
         $this->userService = $userService;
         
-        $this->setRequest($request);
+        parent::__construct($request);
     }
     
     public function actionIndex()
@@ -94,12 +95,12 @@ class UserController extends AbstractController
         }
     }
     
-    public function actionUpdate(int $id)
+    public function actionUpdate()
     {
         try {
             $this->checkMethod('patch');
             $dto = new UpdateUserDTO( $this->request->getData() );
-            $this->userService->update($dto, $id);
+            $this->userService->update($dto);
             $this->response([
                 'status'    => 'success',
                 'message'   => 'User successfully updated'
@@ -124,11 +125,11 @@ class UserController extends AbstractController
         }
     }
     
-    public function actionDelete(int $id)
+    public function actionDelete()
     {
         try {
             $this->checkMethod('delete');
-            $this->userService->delete($id);
+            $this->userService->delete();
             $this->response([
                 'status'    => 'success',
                 'message'   => 'Deleted!'

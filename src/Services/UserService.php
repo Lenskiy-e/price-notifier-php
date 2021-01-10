@@ -85,13 +85,9 @@ class UserService
      * @param int $id
      * @throws NotFoundException
      */
-    public function update(UpdateUserDTO $dto, int $id) : void
+    public function update(UpdateUserDTO $dto) : void
     {
-        $user = $this->userRepository->findById($id);
-        
-        if(!$user) {
-            throw new NotFoundException('Users not found');
-        }
+        $user = $this->session->getUser();
         
         if($dto->getTelegram()) {
             $user->setTelegram($dto->getTelegram());
@@ -109,7 +105,7 @@ class UserService
      */
     public function delete(int $id)
     {
-        $user = $this->userRepository->findById($id);
+        $user = $this->session->getUser();
         
         if(!$user) {
             throw new NotFoundException('Users not found');
@@ -187,7 +183,7 @@ class UserService
         $this->entityManager->flush();
         
         $this->cookie->set('token', password_hash($token,PASSWORD_BCRYPT));
-        $this->session->set('user', $user);
+        $this->session->set('user_id', $user->getId());
 
         return true;
     }

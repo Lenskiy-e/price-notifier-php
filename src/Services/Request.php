@@ -18,13 +18,10 @@ class Request
      */
     public function getData() : array
     {
-        if ($this->isPost()) {
-            if($this->getHeader('Content-Type') === 'application/json') {
-                return json_decode( file_get_contents('php://input'),true );
-            }
-            return $_POST;
+        if($this->getHeader('Content-Type') === 'application/json') {
+            return json_decode( file_get_contents('php://input'),true );
         }
-        return $_GET;
+        return $_POST ?? $_GET;
     }
     
     /**

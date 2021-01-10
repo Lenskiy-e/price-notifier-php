@@ -24,7 +24,7 @@ class Product
     private $id;
     
     /**
-     * @Column(type="string")
+     * @Column(type="string", unique=true)
      */
     private $name;
     
