@@ -2,10 +2,13 @@
 declare(strict_types=1);
 namespace App\Models;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\Table;
 
 /**
@@ -46,6 +49,16 @@ class Users
      */
     private $security_token;
     
+    /**
+     * @var ArrayCollection
+     * @ManyToMany(targetEntity="App\Models\Product", inversedBy="users")
+     */
+    private $products;
+    
+    public function __construct()
+    {
+        $this->products = new ArrayCollection();
+    }
     
     /**
      * @return mixed
@@ -133,6 +146,14 @@ class Users
     public function setSecurityToken($security_token)
     {
         $this->security_token = $security_token;
+    }
+    
+    /**
+     * @return ArrayCollection
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
     }
     
     

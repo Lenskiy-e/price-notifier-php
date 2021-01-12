@@ -24,7 +24,8 @@ class CookieTokenSecurity implements SecurityInterface
      */
     private const NON_VALIDATE_URLS = [
         '/user/auth/{token}',
-        '/user/login'
+        '/user/login',
+        '/home/login'
     ];
     /**
      * @var UserRepository
@@ -54,7 +55,10 @@ class CookieTokenSecurity implements SecurityInterface
      */
     public function isAuthenticated(): bool
     {
-        return $this->validate();
+        if(!$this->validate()) {
+            header('Location: /home/login');
+        }
+        return true;
     }
     
     /**
@@ -66,6 +70,10 @@ class CookieTokenSecurity implements SecurityInterface
             return true;
         }
         
+        if(!$this->checkCredentials()) {
+            return false;
+        }
+        
         $tokenFromCookie = $this->cookie->get('token');
         $user = $this->userRepository->findById( $this->session->get('user_id') );
     
@@ -73,10 +81,6 @@ class CookieTokenSecurity implements SecurityInterface
         
         if($_SERVER['REQUEST_URI'] == '/') {
             return true;
-        }
-        
-        if(!$tokenFromCookie || !$user) {
-            return false;
         }
         
         return password_verify($user->getSecurityToken(),$tokenFromCookie);
@@ -95,5 +99,10 @@ class CookieTokenSecurity implements SecurityInterface
             }
         }
         return false;
+    }
+    
+    private function checkCredentials() : bool
+    {
+        return $this->cookie->has('token') && $this->session->has('user_id');
     }
 }

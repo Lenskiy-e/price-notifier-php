@@ -19,6 +19,16 @@ class HomeController
     
     public function actionIndex()
     {
-        var_dump($this->session->getUser());
+        $user = $this->session->getUser();
+        if($user) {
+            var_dump($user->getProducts()->toArray());
+        }else{
+            echo "Please, log in";
+        }
+    }
+    
+    public function actionLogin()
+    {
+        echo "Login form";
     }
 }
