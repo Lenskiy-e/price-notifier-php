@@ -130,12 +130,29 @@ class ProductService
      */
     public function deleteLink(int $id)
     {
+        /** @var Links $link */
+        $link = $this->linkRepository->findById($id);
+        $this->entityManager->remove($link);
+        $this->entityManager->flush();
     }
     
     /**
      * @param int $id
      */
-    public function getLinks(int $id)
+    public function getLinks(int $id) : array
     {
+        /** @var Product $product */
+        $product = $this->productRepository->findById($id);
+        $links = $product->getLinks()->toArray();
+        $result = [];
+        
+        foreach ($links as $link) {
+            $result[$link->getId()] = [
+                'link'  => $link->getLink(),
+                'shop'  => $link->getShop()
+            ];
+        }
+        
+        return $result;
     }
 }
