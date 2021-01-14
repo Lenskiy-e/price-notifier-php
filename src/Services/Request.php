@@ -14,6 +14,30 @@ class Request
     }
     
     /**
+     * @return bool
+     */
+    public function isDelete() : bool
+    {
+        return $_SERVER['REQUEST_METHOD'] === 'DELETE';
+    }
+    
+    /**
+     * @return bool
+     */
+    public function isPatch() : bool
+    {
+        return $_SERVER['REQUEST_METHOD'] === 'PATCH';
+    }
+    
+    /**
+     * @return bool
+     */
+    public function isGet() : bool
+    {
+        return $_SERVER['REQUEST_METHOD'] === 'GET';
+    }
+    
+    /**
      * @return array
      */
     public function getData() : array

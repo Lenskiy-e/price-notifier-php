@@ -72,7 +72,7 @@ class bootstrap
         ];
         
         $config = Setup::createAnnotationMetadataConfiguration($path,getenv('is_dev'));
-        
+        $config->setAutoGenerateProxyClasses(true);
         return EntityManager::create($params, $config);
     }
     

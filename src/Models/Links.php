@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
@@ -27,6 +28,7 @@ class Links
     /**
      * @Id()
      * @Column(type="integer")
+     * @GeneratedValue
      */
     private $id;
     
@@ -36,12 +38,12 @@ class Links
     private $product;
     
     /**
-     * @Column(type="string", nullable=false)
+     * @Column(type="string", nullable=false, unique=true)
      */
     private $link;
     
     /**
-     * @Column(type="simple_array")
+     * @Column(type="string")
      */
     private $shop;
     
@@ -53,7 +55,6 @@ class Links
     public function __construct()
     {
         $this->active = true;
-        $this->product = new ArrayCollection();
     }
     
     /**
@@ -73,9 +74,9 @@ class Links
     }
     
     /**
-     * @param Collection $product
+     * @param Product $product
      */
-    public function setProduct(Collection $product): void
+    public function setProduct(Product $product): void
     {
         $this->product = $product;
     }

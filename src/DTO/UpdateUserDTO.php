@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
-class UpdateUserDTO implements DTOInterface
+class UpdateUserDTO
 {
     private $telegram;
     private $name;

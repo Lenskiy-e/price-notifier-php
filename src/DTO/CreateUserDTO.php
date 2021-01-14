@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
-class CreateUserDTO extends AbstractDTO implements DTOInterface
+class CreateUserDTO extends AbstractDTO
 {
     private $name;
     private $email;
