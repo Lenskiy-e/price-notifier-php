@@ -155,4 +155,14 @@ class ProductService
         
         return $result;
     }
+
+    public function getUserProducts() : array
+    {
+        $result = [];
+        $products = $this->session->getUser()->getProducts()->toArray();
+        foreach ($products as $product) {
+            $result[$product->getId()] = $this->getLinks($product->getId());
+        }
+        return $result;
+    }
 }

@@ -70,20 +70,23 @@ class UserService
     public function create(CreateUserDTO $dto) : void
     {
         $user = new Users();
+        $email = $dto->getEmail();
+
+        $token = $this->generator->generate(50, $email);
         
         $user->setName($dto->getName());
-        $user->setEmail($dto->getEmail());
+        $user->setEmail($email);
         $user->setTelegram($dto->getTelegram());
-        $user->setLoginToken($this->generator->generate(50, $dto->getEmail()));
+        $user->setLoginToken($token);
         
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        $this->sendLoginToken( $email, $token );
     }
-    
+
     /**
      * @param UpdateUserDTO $dto
-     * @param int $id
-     * @throws NotFoundException
      */
     public function update(UpdateUserDTO $dto) : void
     {
@@ -100,10 +103,9 @@ class UserService
     }
     
     /**
-     * @param int $id
      * @throws NotFoundException
      */
-    public function delete(int $id)
+    public function delete()
     {
         $user = $this->session->getUser();
         
@@ -118,7 +120,6 @@ class UserService
     /**
      * @param string $email
      * @param string|null $token
-     * @return int
      * @throws NotFoundException
      */
     public function login(string $email, ?string $token = null)
@@ -146,16 +147,7 @@ class UserService
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         
-
-        $message = (new Swift_Message())
-            ->setSubject('Login token')
-            ->setFrom( getenv('mail_from') )
-            ->setTo($email)
-            ->setContentType("text/html")
-            ->setBody(
-                "To login click <a href='http://localhost/user/auth/{$token}'>here</a>"
-            );
-        return $this->mailer->send($message);
+        $this->sendLoginToken($email, $token);
     }
     
     /**
@@ -186,5 +178,18 @@ class UserService
         $this->session->set('user_id', $user->getId());
 
         return true;
+    }
+
+    private function sendLoginToken(string $email, string $token)
+    {
+        $message = (new Swift_Message())
+            ->setSubject('Login token')
+            ->setFrom( getenv('mail_from') )
+            ->setTo($email)
+            ->setContentType("text/html")
+            ->setBody(
+                "To login click <a href='http://localhost/user/auth/{$token}'>here</a>"
+            );
+        $this->mailer->send($message);
     }
 }
