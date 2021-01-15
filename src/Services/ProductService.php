@@ -165,4 +165,9 @@ class ProductService
         }
         return $result;
     }
+
+    public function getAll() : array
+    {
+
+    }
 }
