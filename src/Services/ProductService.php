@@ -158,16 +158,26 @@ class ProductService
 
     public function getUserProducts() : array
     {
-        $result = [];
-        $products = $this->session->getUser()->getProducts()->toArray();
-        foreach ($products as $product) {
-            $result[$product->getId()] = $this->getLinks($product->getId());
-        }
-        return $result;
+        return $this->getFullProductsInfo( $this->session->getUser()->getProducts()->toArray() );
     }
 
     public function getAll() : array
     {
+        return $this->getFullProductsInfo( $this->productRepository->getAll() );
+    }
+    
+    private function getFullProductsInfo(array $products) : array
+    {
+        $result = [];
+        foreach ($products as $product) {
 
+            $result[$product->getId()] = [
+                'name'          => $product->getName(),
+                'base_price'    => $product->getBasePrice(),
+                'parse_price'   => $product->getParsePrice(),
+                'links'         => $this->getLinks($product->getId())
+            ];
+        }
+        return $result;
     }
 }

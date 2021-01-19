@@ -84,4 +84,12 @@ class AbstractRepository
         
         return null;
     }
+    
+    /**
+     * @return array
+     */
+    public function getAll() : array
+    {
+        return $this->manager->createQuery("select e from {$this->entity} e")->getResult();
+    }
 }

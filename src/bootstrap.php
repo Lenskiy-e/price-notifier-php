@@ -25,7 +25,6 @@ class bootstrap
     public function run(array $server)
     {
         session_start();
-        $this->loadEnv();
         $container = $this->loadContainer();
         $router = new router($server['REQUEST_URI']);
     
@@ -79,8 +78,9 @@ class bootstrap
     /**
      * @return container
      */
-    private function loadContainer() : container
+    public function loadContainer() : container
     {
+        $this->loadEnv();
         $container = new container();
         
         $container->addService(EntityManagerInterface::class, function(){

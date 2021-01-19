@@ -7,6 +7,7 @@ use App\Services\ProductService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use App\Services\ParseService;
 
 class Parse extends Command
 {
@@ -15,25 +16,27 @@ class Parse extends Command
      * @var ProductService
      */
     private $productService;
-
-    public function __construct
-    (
-        string $name = null,
-        ProductService $productService
-    )
+    /**
+     * @var ParseService
+     */
+    private $parseService;
+    
+    public function __construct(ProductService $productService, ParseService $parseService)
     {
-        parent::__construct($name);
         $this->productService = $productService;
+        $this->parseService = $parseService;
+        parent::__construct();
     }
-
+    
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $output->writeln('Test');
+        $output->writeln('Parse process started');
+        $result = $this->parseService->parse( $this->getAllProducts() );
         return 0;
     }
     
-    private function getAllProducts()
+    private function getAllProducts() : array
     {
-        $products = $this->productService->getAll();
+        return $this->productService->getAll();
     }
 }
