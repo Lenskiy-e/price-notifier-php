@@ -9,17 +9,24 @@ use \DOMDocument;
 class ParseService
 {
     
-    public function parse(array $products) : string
+    public function parse(array $products) : array
     {
+        $result = [];
+        
         foreach ($products as $id => $product) {
             foreach ($product['links'] as $link_id => $link) {
                 $html = $this->loadPage($link['link']);
                 $price = $this->getPrice($link['shop'], $html);
-                var_dump($price);
-                exit();
+                
+                if($price <= $product['parse_price']) {
+                    $result[$id][$link['shop']] = [
+                        'link'  => $link['link'],
+                        'price' => $price
+                    ];
+                }
             }
         }
-        return '';
+        return $result;
     }
     
     private function loadPage(string $link): DOMDocument

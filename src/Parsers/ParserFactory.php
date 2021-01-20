@@ -21,7 +21,14 @@ class ParserFactory
         switch ($shop) {
             case 'foxtrot':
                 return new FoxtrotParser();
-                break;
+            case 'comfy':
+                return new ComfyParser();
+            case 'eldorado':
+                return new EldoradoParser();
+            case 'allo':
+                return new AlloParser();
+            case 'citrus':
+                return new CitrusParser();
         }
     }
 }
