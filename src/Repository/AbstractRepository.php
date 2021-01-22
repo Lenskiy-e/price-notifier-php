@@ -10,7 +10,7 @@ class AbstractRepository
     /**
      * @var EntityManagerInterface
      */
-    private $manager;
+    protected $manager;
     
     /**
      * @var string
@@ -72,7 +72,7 @@ class AbstractRepository
         
         foreach ($params as $key => $param) {
             $query
-                ->where("a.{$key} = :{$key}")
+                ->andWhere("a.{$key} = :{$key}")
                 ->setParameter($key, $param);
         }
         

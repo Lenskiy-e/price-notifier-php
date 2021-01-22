@@ -139,7 +139,7 @@ class UserService
         }
         
         $user->setLoginToken($token);
-        $user->setSecurityToken('');
+        $user->setSecurityToken(null);
         
         $this->session->remove('user');
         $this->cookie->remove('token');
@@ -170,7 +170,7 @@ class UserService
         $token = $this->generator->generate(50, $user->getEmail());
         
         $user->setSecurityToken($token);
-        $user->setLoginToken('');
+        $user->setLoginToken(null);
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         

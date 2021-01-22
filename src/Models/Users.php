@@ -8,8 +8,10 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @Entity()
@@ -50,14 +52,24 @@ class Users
     private $security_token;
     
     /**
+     * @Column(type="boolean", nullable=false)
+     */
+    private $active;
+    
+    /**
      * @var ArrayCollection
      * @ManyToMany(targetEntity="App\Models\Product", inversedBy="users")
+     * @JoinTable(name="users_product",
+     *     joinColumns={@JoinColumn(name="users_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@JoinColumn(name="product_id", referencedColumnName="id")}
+     * )
      */
     private $products;
     
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->active = true;
     }
     
     /**
@@ -154,6 +166,22 @@ class Users
     public function getProducts(): Collection
     {
         return $this->products;
+    }
+    
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+    
+    /**
+     * @param bool $active
+     */
+    public function setActive(bool $active): void
+    {
+        $this->active = $active;
     }
     
     

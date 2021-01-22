@@ -156,13 +156,19 @@ class ProductService
         return $result;
     }
 
-    public function getUserProducts() : array
+    public function getUserProducts(bool $active = true) : array
     {
+        if($active) {
+            return $this->productRepository->getAllActiveProductsWithLinks($this->session->getUser()->getId());
+        }
         return $this->getFullProductsInfo( $this->session->getUser()->getProducts()->toArray() );
     }
 
-    public function getAll() : array
+    public function getAll(int $user_id, bool $active = true) : array
     {
+        if($active) {
+            return $this->productRepository->getAllActiveProductsWithLinks($user_id);
+        }
         return $this->getFullProductsInfo( $this->productRepository->getAll() );
     }
     

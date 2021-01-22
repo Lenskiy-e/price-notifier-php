@@ -9,8 +9,10 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinTable;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\OneToMany;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * Class product
@@ -49,8 +51,17 @@ class Product
     /**
      * @var ArrayCollection
      * @ManyToMany(targetEntity="App\Models\Users", mappedBy="products")
+     * @JoinTable(name="users_product",
+     *     joinColumns={@JoinColumn(name="product_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@JoinColumn(name="users_id", referencedColumnName="id")}
+     *)
      */
     private $users;
+    
+    /**
+     * @OneToMany(targetEntity="App\Models\Prices", mappedBy="product")
+     */
+    private $prices;
     
     /**
      * @OneToMany(targetEntity="App\Models\Links", mappedBy="product")
@@ -62,6 +73,7 @@ class Product
         $this->active = true;
         $this->users = new ArrayCollection();
         $this->links = new ArrayCollection();
+        $this->prices = new ArrayCollection();
     }
     
     /**
@@ -165,12 +177,23 @@ class Product
      */
     public function setParsePrice($parse_price): void
     {
-        if($parse_price > $this->base_price) {
-            $this->parse_price = $this->base_price;
-        }else{
-            $this->parse_price = $parse_price;
-        }
-        
+        $this->parse_price = $parse_price;
+    }
+    
+    /**
+     * @return Collection
+     */
+    public function getPrices(): Collection
+    {
+        return $this->prices;
+    }
+    
+    /**
+     * @param Collection $prices
+     */
+    public function setPrices(Collection $prices): void
+    {
+        $this->prices = $prices;
     }
     
 }

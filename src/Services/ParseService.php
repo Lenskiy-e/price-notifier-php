@@ -19,9 +19,11 @@ class ParseService
                 $price = $this->getPrice($link['shop'], $html);
                 
                 if($price <= $product['parse_price']) {
-                    $result[$id][$link['shop']] = [
-                        'link'  => $link['link'],
-                        'price' => $price
+                    $result[] = [
+                        'shop'      => $link['shop'],
+                        'link'      => $link['link'],
+                        'price'     => $price,
+                        'product'   => $id
                     ];
                 }
             }
@@ -36,13 +38,13 @@ class ParseService
                 "method" => "GET",
                 "header" =>
                     "Accept-language: en\r\n" .
-                    "Cookie: visid_incap_2265310=BQoWXK/+QpWEsSAmatUreyU2B2AAAAAAQUIPAAAAAABkv5ZEiWkC21ANrUPuTEtz; lang=ru; nlbi_2265310=DilEcFXzRTYNJX+CfdLtaQAAAAA1ZgGW0xQXNg+lGjJ2qxjP; incap_ses_533_2265310=92JDaCIJKlSZldk/9ZhlB0FFB2AAAAAAAm7d/UvlGtlbDBLZKJR7sg==\r\n" .
                     "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 11_1_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36"
             ]
         ];
 
         $context = stream_context_create($opts);
         $html = file_get_contents($link, false, $context);
+
         
         $dom = new DOMDocument();
         $internalErrors = libxml_use_internal_errors(true);

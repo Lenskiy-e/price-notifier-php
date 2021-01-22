@@ -1,8 +1,8 @@
 <?php
 
 use App\bootstrap;
+use App\Commands\Fixtures;
 use App\Commands\Parse;
-use App\container;
 use Symfony\Component\Console\Application;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -12,5 +12,6 @@ $bootstrap = new bootstrap();
 $container = $bootstrap->loadContainer();
 
 $application->add($container->getService(Parse::class));
+$application->add($container->getService(Fixtures::class));
 
 $application->run();
