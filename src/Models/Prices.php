@@ -43,10 +43,16 @@ class Prices
      */
     private $date;
     
+    /**
+     * @Column(type="boolean", nullable=false)
+     */
+    private $notified;
+    
     public function __construct()
     {
         $this->id = uniqid();
         $this->date = time();
+        $this->notified = false;
     }
     
     /**
@@ -120,4 +126,21 @@ class Prices
     {
         $this->shop = $shop;
     }
+    
+    /**
+     * @return false
+     */
+    public function getNotified(): bool
+    {
+        return $this->notified;
+    }
+    
+    /**
+     * @param false $notified
+     */
+    public function setNotified(bool $notified): void
+    {
+        $this->notified = $notified;
+    }
+    
 }

@@ -4,8 +4,11 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use App\Models\Prices;
+use App\Models\Users;
+use App\Repository\PriceRepository;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
+use App\Services\MailerService;
 use App\Services\ProductService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -36,13 +39,23 @@ class Parse extends Command
      * @var ProductRepository
      */
     private $productRepository;
+    /**
+     * @var PriceRepository
+     */
+    private $priceRepository;
+    /**
+     * @var MailerService
+     */
+    private $mailer;
     
     public function __construct(
         ProductService $productService,
         ParseService $parseService,
         UserRepository $userRepository,
         EntityManagerInterface $manager,
-        ProductRepository $productRepository
+        ProductRepository $productRepository,
+        PriceRepository $priceRepository,
+        MailerService $mailer
     )
     {
         $this->productService = $productService;
@@ -50,7 +63,11 @@ class Parse extends Command
         $this->userRepository = $userRepository;
         $this->manager = $manager;
         $this->productRepository = $productRepository;
+        $this->priceRepository = $priceRepository;
+        $this->mailer = $mailer;
+    
         parent::__construct();
+        
     }
     
     protected function execute(InputInterface $input, OutputInterface $output) : int
@@ -63,6 +80,7 @@ class Parse extends Command
             
             $this->createPrice( $this->parseService->parse( $this->getAllProducts($user) ) );
         }
+        $this->getPricesForNotification();
         return 0;
     }
     
@@ -94,5 +112,12 @@ class Parse extends Command
             $this->manager->persist($price);
             $this->manager->flush();
         }
+    }
+    
+    private function getPricesForNotification() : array
+    {
+        $data = $this->userRepository->getSubscribedProductsPrices();
+        var_dump($data);
+        exit();
     }
 }

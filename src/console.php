@@ -1,7 +1,6 @@
 <?php
 
 use App\bootstrap;
-use App\Commands\Fixtures;
 use App\Commands\Parse;
 use Symfony\Component\Console\Application;
 
@@ -12,6 +11,6 @@ $bootstrap = new bootstrap();
 $container = $bootstrap->loadContainer();
 
 $application->add($container->getService(Parse::class));
-$application->add($container->getService(Fixtures::class));
+$application->add($container->getService(\App\Commands\Fixtures::class));
 
 $application->run();
