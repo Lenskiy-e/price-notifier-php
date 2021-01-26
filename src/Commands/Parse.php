@@ -73,20 +73,17 @@ class Parse extends Command
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $output->writeln('Parse process started');
+    
+        $this->createPrice( $this->parseService->parse( $this->getAllProducts() ) );
+        $this->notify();
         
-        foreach ($this->getUsers() as $user) {
-//            var_dump($this->parseService->parse( $this->getAllProducts($user) ));
-//            exit();
-            
-            $this->createPrice( $this->parseService->parse( $this->getAllProducts($user) ) );
-        }
-        $this->getPricesForNotification();
+        $output->writeln('Success');
         return 0;
     }
     
-    private function getAllProducts(int $user_id) : array
+    private function getAllProducts() : array
     {
-        return $this->productService->getAll($user_id,true);
+        return $this->productRepository->getProductsForParse();
     }
     
     private function getUsers() : array
@@ -114,10 +111,32 @@ class Parse extends Command
         }
     }
     
-    private function getPricesForNotification() : array
+    private function notify() : void
     {
-        $data = $this->userRepository->getSubscribedProductsPrices();
-        var_dump($data);
-        exit();
+        $items = $this->userRepository->getSubscribedProductsPrices();
+        $price_ids = [];
+    
+        foreach ($items as $item) {
+            $message = "<h3>There are good prices for your products: </h3>";
+            $temp_ids = [];
+        
+            foreach ($item['products'] as $product) {
+                $message .= "<p>{$product['name']} : </p>";
+                $message .= "<ul>";
+                foreach ($product['links'] as $link) {
+                    $temp_ids[] = $link['price_id'];
+                    
+                    $message .= "<li> <a href='{$link['link']}' target='_blank'>{$link['shop']}</a> {$link['price']}</li>";
+                }
+                $message .= "</ul>";
+            }
+            
+            if( $this->mailer->send($item['email'], 'New discounts!', $message) ) {
+                $price_ids = array_merge($price_ids, $temp_ids);
+                unset($temp_ids);
+            }
+        }
+        
+        $this->priceRepository->setNotify( array_unique($price_ids) );
     }
 }

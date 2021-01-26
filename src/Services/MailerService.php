@@ -22,8 +22,9 @@ class MailerService
      * @param string $mail_to
      * @param string $subject
      * @param string $body
+     * @return int
      */
-    public function send(string $mail_to, string $subject, string $body)
+    public function send(string $mail_to, string $subject, string $body): int
     {
         $message = (new Swift_Message())
             ->setSubject($subject)
@@ -31,6 +32,6 @@ class MailerService
             ->setTo($mail_to)
             ->setContentType("text/html")
             ->setBody($body);
-        $this->mailer->send($message);
+        return $this->mailer->send($message);
     }
 }

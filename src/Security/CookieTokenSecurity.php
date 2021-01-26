@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Security;
 
+use App\Models\Users;
 use App\Repository\UserRepository;
 use App\Services\Cookie;
 use App\Services\Session;
@@ -79,11 +80,13 @@ class CookieTokenSecurity implements SecurityInterface
     
         $this->session->set('user',$user);
         
+        $valid = $this->validateToken($user, $tokenFromCookie);
+        
         if($_SERVER['REQUEST_URI'] == '/') {
             return true;
         }
         
-        return password_verify($user->getSecurityToken(),$tokenFromCookie);
+        return $valid;
     }
     
     /**
@@ -104,5 +107,15 @@ class CookieTokenSecurity implements SecurityInterface
     private function checkCredentials() : bool
     {
         return $this->cookie->has('token') && $this->session->has('user_id');
+    }
+    
+    private function validateToken(Users $user, string $token) : bool
+    {
+        $valid = password_verify($user->getSecurityToken() ?? '',$token);
+        
+        if(!$valid) {
+            $this->session->remove('user_id');
+        }
+        return $valid;
     }
 }
