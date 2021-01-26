@@ -4,12 +4,13 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use App\Models\Prices;
-use App\Models\Users;
+use App\QueueHandlers\MessageHandler;
 use App\Repository\PriceRepository;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use App\Services\MailerService;
 use App\Services\ProductService;
+use App\Services\QueueService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,7 +48,22 @@ class Parse extends Command
      * @var MailerService
      */
     private $mailer;
+    /**
+     * @var QueueService
+     */
+    private $queue;
     
+    /**
+     * Parse constructor.
+     * @param ProductService $productService
+     * @param ParseService $parseService
+     * @param UserRepository $userRepository
+     * @param EntityManagerInterface $manager
+     * @param ProductRepository $productRepository
+     * @param PriceRepository $priceRepository
+     * @param MailerService $mailer
+     * @param QueueService $queue
+     */
     public function __construct(
         ProductService $productService,
         ParseService $parseService,
@@ -55,7 +71,8 @@ class Parse extends Command
         EntityManagerInterface $manager,
         ProductRepository $productRepository,
         PriceRepository $priceRepository,
-        MailerService $mailer
+        MailerService $mailer,
+        QueueService $queue
     )
     {
         $this->productService = $productService;
@@ -65,39 +82,32 @@ class Parse extends Command
         $this->productRepository = $productRepository;
         $this->priceRepository = $priceRepository;
         $this->mailer = $mailer;
+        $this->queue = $queue;
     
         parent::__construct();
-        
     }
     
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $output->writeln('Parse process started');
     
-        $this->createPrice( $this->parseService->parse( $this->getAllProducts() ) );
+        $this->createPrice();
         $this->notify();
         
         $output->writeln('Success');
         return 0;
     }
     
-    private function getAllProducts() : array
+    private function createPrice()
     {
-        return $this->productRepository->getProductsForParse();
-    }
-    
-    private function getUsers() : array
-    {
-        $users = [];
-
-        foreach ( $this->userRepository->findBy(['active' => true]) as $user) {
-            $users[] = $user->getId();
-        }
-        return $users;
-    }
-    
-    private function createPrice(array $priceData)
-    {
+        
+        $priceData = $this->parseService->parse( $this->productRepository->getProductsForParse() );
+        
         foreach ($priceData as $link) {
             $product = $this->productRepository->findById($link['product']);
             $price = new Prices();
@@ -113,6 +123,7 @@ class Parse extends Command
     
     private function notify() : void
     {
+        
         $items = $this->userRepository->getSubscribedProductsPrices();
         $price_ids = [];
     
@@ -131,12 +142,16 @@ class Parse extends Command
                 $message .= "</ul>";
             }
             
-            if( $this->mailer->send($item['email'], 'New discounts!', $message) ) {
-                $price_ids = array_merge($price_ids, $temp_ids);
-                unset($temp_ids);
-            }
+            $this->mailer->setMailTo($item['email']);
+            $this->mailer->setSubject('Price notification');
+            $this->mailer->setBody($message);
+            
+            $this->queue->createMessage(new MessageHandler($this->mailer));
+            $price_ids = array_merge($price_ids, $temp_ids);
+            unset($temp_ids);
         }
         
+        $this->queue->close();
         $this->priceRepository->setNotify( array_unique($price_ids) );
     }
 }

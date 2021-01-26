@@ -13,6 +13,10 @@ class MailerService
      */
     private $mailer;
     
+    private $mail_to;
+    private $subject;
+    private $body;
+    
     public function __construct(Swift_Mailer $mailer)
     {
         $this->mailer = $mailer;
@@ -24,14 +28,40 @@ class MailerService
      * @param string $body
      * @return int
      */
-    public function send(string $mail_to, string $subject, string $body): int
+    public function send(): int
     {
         $message = (new Swift_Message())
-            ->setSubject($subject)
+            ->setSubject($this->subject)
             ->setFrom( getenv('mail_from') )
-            ->setTo($mail_to)
+            ->setTo($this->mail_to)
             ->setContentType("text/html")
-            ->setBody($body);
+            ->setBody($this->body);
         return $this->mailer->send($message);
     }
+    
+    /**
+     * @param mixed $mail_to
+     */
+    public function setMailTo($mail_to): void
+    {
+        $this->mail_to = $mail_to;
+    }
+    
+    /**
+     * @param mixed $subject
+     */
+    public function setSubject($subject): void
+    {
+        $this->subject = $subject;
+    }
+    
+    /**
+     * @param mixed $body
+     */
+    public function setBody($body): void
+    {
+        $this->body = $body;
+    }
+    
+    
 }

@@ -1,0 +1,14 @@
+db_adapter=pdo_pgsql
+db_host=
+db_login=
+db_password=
+db_name=
+is_dev=true
+mail_from=
+mailer_dns=
+mailer_port=
+check_security=
+amqp_host=
+amq_port=
+amq_login=
+amq_password=
