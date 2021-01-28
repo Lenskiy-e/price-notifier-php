@@ -20,10 +20,15 @@ class exceptionHandler
     
     public function handle()
     {
-        echo $this->exception->getMessage();
-        echo PHP_EOL;
-        echo $this->exception->getCode();
-        echo "<pre>";
-        print_r($this->exception->getTrace());
+        if(getenv('is_dev')) {
+            echo $this->exception->getMessage();
+            echo PHP_EOL;
+            echo $this->exception->getCode();
+            echo "<pre>";
+            print_r($this->exception->getTrace());
+        }else{
+            echo $this->exception->getMessage();
+        }
+        exit();
     }
 }

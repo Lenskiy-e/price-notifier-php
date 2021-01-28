@@ -32,13 +32,13 @@ class bootstrap
             /**
              * @var SecurityInterface $security
              */
-            $security = $container->getService(SecurityInterface::class);
+            $security = $container->get(SecurityInterface::class);
             if(!$security->isAuthenticated()) {
                 throw new UnauthorizedException('Need to authenticate!');
             }
         }
         
-        $controller = $container->getService("App\\Controllers\\{$router->getController()}");
+        $controller = $container->get("App\\Controllers\\{$router->getController()}");
         $action = $router->getAction();
     
         if(!$controller) {
@@ -83,23 +83,23 @@ class bootstrap
         $this->loadEnv();
         $container = new container();
         
-        $container->addService(EntityManagerInterface::class, function(){
+        $container->add(EntityManagerInterface::class, function(){
             return $this->configOrm() instanceof EntityManagerInterface ? $this->configOrm() : null;
         });
         
-        $container->addService(Swift_SmtpTransport::class, function (){
+        $container->add(Swift_SmtpTransport::class, function (){
             return new Swift_SmtpTransport( getenv('mailer_dns'),getenv('mailer_port') );
         });
 
-        $container->addService(Swift_Mailer::class, function () use($container){
-            return new Swift_Mailer( $container->getService(Swift_SmtpTransport::class) );
+        $container->add(Swift_Mailer::class, function () use($container){
+            return new Swift_Mailer( $container->get(Swift_SmtpTransport::class) );
         });
         
-        $container->addService(SecurityInterface::class, function () use ($container){
+        $container->add(SecurityInterface::class, function () use ($container){
             $security = new CookieTokenSecurity(
-                $container->getService(Cookie::class),
-                $container->getService(Session::class),
-                $container->getService(UserRepository::class)
+                $container->get(Cookie::class),
+                $container->get(Session::class),
+                $container->get(UserRepository::class)
             );
             return $security instanceof SecurityInterface ? $security : null;
         });

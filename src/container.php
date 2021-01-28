@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Exception\ContainerException;
+use \DirectoryIterator;
+use \ReflectionClass;
+use \Closure;
+
 /**
  * Class container
  * @package App
@@ -29,6 +34,7 @@ class container
     
     /**
      *
+     * @throws \ReflectionException
      */
     public function run()
     {
@@ -42,7 +48,7 @@ class container
      */
     public function loadServices(string $path, string $prefix = '')
     {
-        $objects = new \DirectoryIterator($path);
+        $objects = new DirectoryIterator($path);
 
         foreach ($objects as /** @var \DirectoryIterator $object */$object) {
             if($object->isDir() && !$object->isDot()) {
@@ -57,7 +63,7 @@ class container
                 $serviceParameters = [];
 
                 if(class_exists(str_replace('/', '\\', $pathToClass))) {
-                    $class = new \ReflectionClass( str_replace('/', '\\', $pathToClass) );
+                    $class = new ReflectionClass( str_replace('/', '\\', $pathToClass) );
                     $serviceName = $class->getName();
     
                     $constructor = $class->getConstructor();
@@ -65,21 +71,21 @@ class container
                     if($constructor) {
                         foreach ($constructor->getParameters() as $argument) {
                             $type = (string)$argument->getType();
-                            if ( $this->hasService($type) ) {
-                                $serviceParameters[] = $this->getService($type);
+                            if ( $this->has($type) ) {
+                                $serviceParameters[] = $this->get($type);
                             }
             
-                            if( !$this->hasService($type) ) {
+                            if( !$this->has($type) ) {
                                 $serviceParameters[] = function () use($type){
-                                    return $this->getService($type);
+                                    return $this->get($type);
                                 };
                             }
                         }
                     }
     
-                    $this->addService($serviceName, function() use($serviceName,$serviceParameters){
+                    $this->add($serviceName, function() use($serviceName,$serviceParameters){
                         foreach ($serviceParameters as &$serviceParameter) {
-                            if($serviceParameter instanceof \Closure) {
+                            if($serviceParameter instanceof Closure) {
                                 $serviceParameter = $serviceParameter();
                             }
                         }
@@ -95,44 +101,45 @@ class container
     /**
      * @return array
      */
-    public function getServices(): array
+    public function getAll(): array
     {
         return $this->services;
     }
     
     /**
-     * @param string $name
+     * @param string $id
      * @return mixed|null
+     * @throws ContainerException
      */
-    public function getService(string $name)
+    public function get(string $id)
     {
-        if (!$this->hasService($name)) {
-            return null;
+        if (!$this->has($id)) {
+            throw new ContainerException("Service {$id} not found!");
         }
         
-        if ($this->services[$name] instanceof \Closure) {
-            $this->services[$name] = $this->services[$name]();
+        if ($this->services[$id] instanceof Closure) {
+            $this->services[$id] = $this->services[$id]();
         }
         
-        return $this->services[$name];
+        return $this->services[$id];
     }
     
     /**
-     * @param $service
+     * @param string $id
      * @return bool
      */
-    private function hasService($service) : bool
+    private function has(string $id) : bool
     {
-        return isset($this->services[$service]);
+        return isset($this->services[$id]);
     }
     
     /**
      * @param string $name
      * @param \Closure $closure
      */
-    public function addService(string $name, \Closure $closure)
+    public function add(string $name, Closure $closure)
     {
-        if(!$this->hasService($name)) {
+        if(!$this->has($name)) {
             $this->services[$name] = $closure;
         }
     }
