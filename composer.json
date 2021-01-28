@@ -16,7 +16,9 @@
     "ext-dom": "*",
     "guzzlehttp/guzzle": "^7.2",
     "php-amqplib/php-amqplib": "^2.12",
-    "psr/container": "^1.0"
+    "psr/container": "^1.0",
+    "ext-libxml": "*",
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {

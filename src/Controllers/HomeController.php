@@ -54,6 +54,6 @@ class HomeController extends AbstractController
     
     public function actionLogin()
     {
-        echo "Login form";
+        // TODO: login form
     }
 }

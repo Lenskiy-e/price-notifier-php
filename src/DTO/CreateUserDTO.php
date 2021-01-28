@@ -5,8 +5,17 @@ namespace App\DTO;
 
 class CreateUserDTO extends AbstractDTO
 {
+    /**
+     * @var string
+     */
     private $name;
+    /**
+     * @var string
+     */
     private $email;
+    /**
+     * @var null|string
+     */
     private $telegram;
     
     public function __construct(array $data)

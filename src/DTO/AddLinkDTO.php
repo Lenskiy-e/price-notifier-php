@@ -8,12 +8,12 @@ use App\Models\Links;
 class AddLinkDTO extends AbstractDTO
 {
     /**
-     * @string
+     * @var string
      */
     private $link;
     
     /**
-     * @string
+     * @var string
      */
     private $shop;
     
@@ -32,7 +32,7 @@ class AddLinkDTO extends AbstractDTO
     }
     
     /**
-     * @return mixed
+     * @return string
      */
     public function getLink() : string
     {
@@ -40,7 +40,7 @@ class AddLinkDTO extends AbstractDTO
     }
     
     /**
-     * @param mixed $link
+     * @param string $link
      */
     public function setLink(string $link): void
     {
@@ -48,7 +48,7 @@ class AddLinkDTO extends AbstractDTO
     }
     
     /**
-     * @return mixed
+     * @return string
      */
     public function getShop(): string
     {
@@ -56,7 +56,7 @@ class AddLinkDTO extends AbstractDTO
     }
     
     /**
-     * @param mixed $shop
+     * @param string $shop
      */
     public function setShop(string $shop): void
     {

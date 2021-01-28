@@ -7,11 +7,13 @@ use App\Models\Prices;
 
 class PriceRepository extends AbstractRepository
 {
+    /**
+     * @var Prices
+     */
     protected $entity = Prices::class;
     
     /**
      * @param array $ids
-     * @return int|mixed|string
      */
     public function setNotify(array $ids)
     {

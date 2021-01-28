@@ -21,7 +21,7 @@ class CookieTokenSecurity implements SecurityInterface
     private $session;
     
     /**
-     *
+     * @var array
      */
     private const NON_VALIDATE_URLS = [
         '/user/auth/{token}',
@@ -104,11 +104,19 @@ class CookieTokenSecurity implements SecurityInterface
         return false;
     }
     
+    /**
+     * @return bool
+     */
     private function checkCredentials() : bool
     {
         return $this->cookie->has('token') && $this->session->has('user_id');
     }
     
+    /**
+     * @param Users $user
+     * @param string $token
+     * @return bool
+     */
     private function validateToken(Users $user, string $token) : bool
     {
         $valid = password_verify($user->getSecurityToken() ?? '',$token);

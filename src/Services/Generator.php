@@ -6,8 +6,17 @@ namespace App\Services;
 
 class Generator
 {
+    /**
+     * @var string
+     */
     private const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     
+    /**
+     * @param int $length
+     * @param string $additional
+     * @return string
+     * @throws \Exception
+     */
     public function generate(int $length, string $additional = '') : string
     {
         $maxNumber = strlen(self::CHARS);

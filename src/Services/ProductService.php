@@ -155,7 +155,11 @@ class ProductService
         
         return $result;
     }
-
+    
+    /**
+     * @param bool $active
+     * @return array
+     */
     public function getUserProducts(bool $active = true) : array
     {
         if($active) {
@@ -163,7 +167,12 @@ class ProductService
         }
         return $this->getFullProductsInfo( $this->session->getUser()->getProducts()->toArray() );
     }
-
+    
+    /**
+     * @param int $user_id
+     * @param bool $active
+     * @return array
+     */
     public function getAll(int $user_id, bool $active = true) : array
     {
         if($active) {
@@ -172,6 +181,10 @@ class ProductService
         return $this->getFullProductsInfo( $this->productRepository->getAll() );
     }
     
+    /**
+     * @param array $products
+     * @return array
+     */
     private function getFullProductsInfo(array $products) : array
     {
         $result = [];

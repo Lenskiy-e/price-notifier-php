@@ -11,6 +11,7 @@ use App\Exception\NotFoundException;
 use App\Services\ProductService;
 use App\Services\Request;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Exception;
 
 class ProductController extends AbstractController
 {
@@ -58,7 +59,7 @@ class ProductController extends AbstractController
                 'message'   => 'Product already exists'
             ],400);
         }
-        catch (\Exception $e) {
+        catch (Exception $e) {
             $this->response([
                 'status'    => 'error',
                 'message'   => $e->getMessage()
@@ -66,6 +67,9 @@ class ProductController extends AbstractController
         }
     }
     
+    /**
+     * @param int $id
+     */
     public function actionLink(int $id)
     {
         $code = 200;
@@ -111,7 +115,7 @@ class ProductController extends AbstractController
                 'status'    => 'error',
                 'message'   => 'Link already exists'
             ],400);
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $this->response([
                 'status'    => 'error',
                 'message'   => $e->getMessage()

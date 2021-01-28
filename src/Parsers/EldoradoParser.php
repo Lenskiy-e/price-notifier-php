@@ -8,7 +8,10 @@ use DOMDocument;
 
 class EldoradoParser implements ParserInterface
 {
-    
+    /**
+     * @param DOMDocument $document
+     * @return float
+     */
     public function parse(DOMDocument $document): float
     {
         $divs = $document->getElementsByTagName('div');
@@ -18,5 +21,6 @@ class EldoradoParser implements ParserInterface
                 return (float)$div->getAttribute('content');
             }
         }
+        return 0;
     }
 }

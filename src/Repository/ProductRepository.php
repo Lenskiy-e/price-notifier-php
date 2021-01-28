@@ -4,44 +4,40 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Models\Product;
-use Doctrine\ORM\Query\Expr\Join;
 
 class ProductRepository extends AbstractRepository
 {
+    /**
+     * @var Product
+     */
     protected $entity = Product::class;
     
+    /**
+     * @return array
+     */
     public function getProductsForParse() : array
     {
         $query =
-            "
-            select distinct (p.id) as product_id, p.name, p.base_price, p.parse_price, l.id as link_id, l.link, l.shop
+            "select distinct (p.id) as product_id, p.name, p.base_price, p.parse_price, l.id as link_id, l.link, l.shop
             from {$this->entity} p
             inner join p.users u with u.active = true
             inner join p.links l with l.active = true
-            where p.active = true
-            ";
+            where p.active = true";
         
         return $this->productsWithLinksFormat($this->manager->createQuery($query)->getArrayResult());
     }
     
+    /**
+     * @param int $user_id
+     * @return array
+     */
     public function getAllActiveProductsWithLinks(int $user_id) : array
     {
-        $products = [];
-//
-//        $query = $this->qb->select('p.id as product_id, p.name, p.base_price, p.parse_price, l.id as link_id, l.link, l.shop')
-//            ->from($this->entity, 'p')
-//            ->innerJoin('p.users', 'u')
-//            ->innerJoin('p.links', 'l', Join::WITH, 'l.active=true')
-//            ->where('u.id = :user_id')
-//            ->andWhere('p.active = true');
-        
         $query =
-            "
-            select p.id as product_id, p.name, p.base_price, p.parse_price, l.id as link_id, l.link, l.shop
+            "select p.id as product_id, p.name, p.base_price, p.parse_price, l.id as link_id, l.link, l.shop
             from {$this->entity} p inner join p.users u
             inner join p.links l with l.active = true
-            where u.id = :user_id and p.active = true
-            ";
+            where u.id = :user_id and p.active = true";
         
         $result = $this->manager->createQuery($query);
 
@@ -51,6 +47,10 @@ class ProductRepository extends AbstractRepository
 
     }
     
+    /**
+     * @param array $queryResult
+     * @return array
+     */
     private function productsWithLinksFormat(array $queryResult) : array
     {
         $products = [];

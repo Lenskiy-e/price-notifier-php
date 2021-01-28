@@ -7,8 +7,15 @@ use App\Models\Links;
 
 class LinkRepository extends AbstractRepository
 {
+    /**
+     * @var Links
+     */
     protected $entity = Links::class;
     
+    /**
+     * @param bool|null $active
+     * @return array
+     */
     public function getProductLinks(?bool $active = null) : array
     {
         $query = $this->qb

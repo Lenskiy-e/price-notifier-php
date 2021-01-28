@@ -9,6 +9,10 @@ use \DOMDocument;
 class ParseService
 {
     
+    /**
+     * @param array $products
+     * @return array
+     */
     public function parse(array $products) : array
     {
         $result = [];
@@ -31,6 +35,10 @@ class ParseService
         return $result;
     }
     
+    /**
+     * @param string $link
+     * @return DOMDocument
+     */
     private function loadPage(string $link): DOMDocument
     {
         $opts = [
@@ -53,6 +61,12 @@ class ParseService
         return $dom;
     }
     
+    /**
+     * @param string $shop
+     * @param DOMDocument $document
+     * @return float
+     * @throws \App\Exception\NotFoundException
+     */
     private function getPrice(string $shop, DOMDocument $document) : float
     {
         $parser = ParserFactory::getParser($shop);

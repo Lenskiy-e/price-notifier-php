@@ -7,7 +7,10 @@ use DOMDocument;
 
 class FoxtrotParser implements ParserInterface
 {
-    
+    /**
+     * @param DOMDocument $document
+     * @return float
+     */
     public function parse(DOMDocument $document): float
     {
         $divs = $document->getElementsByTagName('div');
@@ -16,5 +19,6 @@ class FoxtrotParser implements ParserInterface
                 return (float)$div->getAttribute('data-price');
             }
         }
+        return 0;
     }
 }

@@ -8,7 +8,10 @@ use DOMDocument;
 
 class ComfyParser implements ParserInterface
 {
-    
+    /**
+     * @param DOMDocument $document
+     * @return float
+     */
     public function parse(DOMDocument $document): float
     {
         $spans = $document->getElementsByTagName('span');
@@ -18,5 +21,6 @@ class ComfyParser implements ParserInterface
                 return (float)$span->getAttribute('content');
             }
         }
+        return 0;
     }
 }

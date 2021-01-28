@@ -9,6 +9,7 @@ use App\Exception\NotFoundException;
 use App\Models\Users;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Swift_Mailer;
 use \Swift_Message;
 
 class UserService
@@ -26,7 +27,7 @@ class UserService
      */
     private $userRepository;
     /**
-     * @var \Swift_Mailer
+     * @var Swift_Mailer
      */
     private $mailer;
     /**
@@ -43,7 +44,7 @@ class UserService
      * @param EntityManagerInterface $entityManager
      * @param Generator $generator
      * @param UserRepository $userRepository
-     * @param \Swift_Mailer $mailer
+     * @param Swift_Mailer $mailer
      * @param Session $session
      * @param Cookie $cookie
      */
@@ -51,7 +52,7 @@ class UserService
         EntityManagerInterface $entityManager,
         Generator $generator,
         UserRepository $userRepository,
-        \Swift_Mailer $mailer,
+        Swift_Mailer $mailer,
         Session $session,
         Cookie $cookie
     )
@@ -153,6 +154,7 @@ class UserService
     /**
      * @param string $token
      * @return bool
+     * @throws NotFoundException
      */
     public function auth(string $token) : bool
     {
@@ -179,7 +181,11 @@ class UserService
 
         return true;
     }
-
+    
+    /**
+     * @param string $email
+     * @param string $token
+     */
     private function sendLoginToken(string $email, string $token)
     {
         $message = (new Swift_Message())

@@ -8,7 +8,10 @@ use DOMDocument;
 
 class CitrusParser implements ParserInterface
 {
-    
+    /**
+     * @param DOMDocument $document
+     * @return float
+     */
     public function parse(DOMDocument $document): float
     {
         $scripts = $document->getElementsByTagName('script');
@@ -19,5 +22,6 @@ class CitrusParser implements ParserInterface
                 return (float)$data['offers']['price'];
             }
         }
+        return 0;
     }
 }

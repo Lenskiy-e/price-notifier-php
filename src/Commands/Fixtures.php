@@ -29,6 +29,11 @@ class Fixtures extends Command
      */
     private $userRepository;
     
+    /**
+     * Fixtures constructor.
+     * @param EntityManagerInterface $manager
+     * @param UserRepository $userRepository
+     */
     public function __construct
     (
         EntityManagerInterface $manager,
@@ -45,6 +50,11 @@ class Fixtures extends Command
         $this->addArgument('count', InputArgument::REQUIRED);
     }
     
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $count = $input->getArgument('count');
@@ -56,6 +66,9 @@ class Fixtures extends Command
         return 1;
     }
     
+    /**
+     * @return Product
+     */
     private function createProduct() : Product
     {
         $product = new Product();
@@ -73,6 +86,9 @@ class Fixtures extends Command
         return $product;
     }
     
+    /**
+     * @param Product $product
+     */
     private function createLink(Product $product)
     {
         foreach (Links::SHOPS as $shop) {

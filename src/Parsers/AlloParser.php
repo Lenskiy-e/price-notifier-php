@@ -8,7 +8,10 @@ use DOMDocument;
 
 class AlloParser implements ParserInterface
 {
-    
+    /**
+     * @param DOMDocument $document
+     * @return float
+     */
     public function parse(DOMDocument $document): float
     {
         $metas = $document->getElementsByTagName('meta');
@@ -18,5 +21,6 @@ class AlloParser implements ParserInterface
                 return (float)$meta->getAttribute('content');
             }
         }
+        return 0;
     }
 }

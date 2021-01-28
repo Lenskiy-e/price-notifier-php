@@ -13,6 +13,10 @@ class MessageHandler implements QueueHandler
      */
     private $mailer;
     
+    /**
+     * MessageHandler constructor.
+     * @param MailerService $mailer
+     */
     public function __construct(MailerService $mailer)
     {
         $this->mailer = $mailer;

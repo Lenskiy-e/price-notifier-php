@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\QueueHandlers\QueueHandler;
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class QueueService
 {
     /**
-     * @var \PhpAmqpLib\Channel\AMQPChannel
+     * @var AMQPChannel
      */
     private $channel;
     

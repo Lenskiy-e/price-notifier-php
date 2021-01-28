@@ -8,12 +8,12 @@ use App\Models\Links;
 class EditLinkDTO extends AbstractDTO
 {
     /**
-     * @string
+     * @var string
      */
     private $link;
     
     /**
-     * @string
+     * @var string
      */
     private $shop;
     

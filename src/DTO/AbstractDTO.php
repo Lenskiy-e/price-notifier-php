@@ -7,6 +7,11 @@ use App\Exception\DTOException;
 
 class AbstractDTO
 {
+    /**
+     * @param string $field
+     * @param array $data
+     * @throws DTOException
+     */
     protected function checkField(string $field, array $data)
     {
         if(!isset($data[$field])) {

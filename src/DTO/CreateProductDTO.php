@@ -7,8 +7,17 @@ use App\Exception\DTOException;
 
 class CreateProductDTO extends AbstractDTO
 {
+    /**
+     * @var string
+     */
     private $name;
+    /**
+     * @var float
+     */
     private $base_price;
+    /**
+     * @var float
+     */
     private $parse_price;
     
     public function __construct(array $data)
@@ -29,9 +38,9 @@ class CreateProductDTO extends AbstractDTO
     }
     
     /**
-     * @return mixed
+     * @return string
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }

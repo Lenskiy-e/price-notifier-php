@@ -1,15 +1,17 @@
 <?php
 
-
 namespace App\Parsers;
-
 
 use App\Exception\NotFoundException;
 use App\Models\Links;
-use App\Models\Product;
 
 class ParserFactory
 {
+    /**
+     * @param string $shop
+     * @return ParserInterface
+     * @throws NotFoundException
+     */
     public static function getParser(string $shop) : ParserInterface
     {
         $shop = strtolower($shop);
@@ -29,6 +31,8 @@ class ParserFactory
                 return new AlloParser();
             case 'citrus':
                 return new CitrusParser();
+            default:
+                throw new NotFoundException('shop not found');
         }
     }
 }

@@ -13,8 +13,19 @@ class MailerService
      */
     private $mailer;
     
+    /**
+     * @var string
+     */
     private $mail_to;
+    
+    /**
+     * @var string
+     */
     private $subject;
+    
+    /**
+     * @var string
+     */
     private $body;
     
     public function __construct(Swift_Mailer $mailer)
@@ -23,9 +34,6 @@ class MailerService
     }
     
     /**
-     * @param string $mail_to
-     * @param string $subject
-     * @param string $body
      * @return int
      */
     public function send(): int

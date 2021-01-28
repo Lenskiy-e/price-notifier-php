@@ -14,11 +14,12 @@ use App\Services\UserService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
+use Exception;
 
 class UserController extends AbstractController
 {
     /**
-     * @var User
+     * @var Users
      */
     private $model;
     /**
@@ -59,20 +60,23 @@ class UserController extends AbstractController
     
     public function actionIndex()
     {
-        echo "Hello from index";
+        // TODO: action index
     }
     
     public function actionGet(int $id)
     {
-        var_dump($this->userRepository->findById($id));
+        // TODO: action get
     }
     
     public function actionCreate()
     {
         try {
             $this->checkMethod('post');
+            
             $dto = new CreateUserDTO( $this->request->getData() );
+            
             $this->userService->create($dto);
+            
             $this->response([
                 'status'    => 'success',
                 'message'   => 'Users successfully created, check your email to receive the login token'
@@ -87,7 +91,7 @@ class UserController extends AbstractController
                 'status' => 'error',
                 'message' => 'Duplicate field provided'
             ], 400);
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $this->response([
                 'status' => 'error',
                 'message' => $e->getMessage()
@@ -99,8 +103,11 @@ class UserController extends AbstractController
     {
         try {
             $this->checkMethod('patch');
+            
             $dto = new UpdateUserDTO( $this->request->getData() );
+            
             $this->userService->update($dto);
+            
             $this->response([
                 'status'    => 'success',
                 'message'   => 'User successfully updated'
@@ -117,7 +124,7 @@ class UserController extends AbstractController
             ], 400);
         }catch(NotFoundException $e){
             $this->returnNotFound($e->getMessage());
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $this->response([
                 'status' => 'error',
                 'message' => $e->getMessage()
@@ -136,7 +143,7 @@ class UserController extends AbstractController
             ],200);
         }catch(NotFoundException $e){
             $this->returnNotFound($e->getMessage());
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $this->response([
                 'status' => 'error',
                 'message' => $e->getMessage()
@@ -156,7 +163,7 @@ class UserController extends AbstractController
             $this->userService->login( $this->request->get('email') );
         }catch(NotFoundException|NoResultException $e){
             $this->returnNotFound('User not found');
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $this->response([
                 'status' => 'error',
                 'message' => $e->getMessage()
@@ -179,7 +186,7 @@ class UserController extends AbstractController
             
         }catch(NotFoundException|NoResultException $e){
             $this->returnNotFound('Token not found');
-        }catch (\Exception $e) {
+        }catch (Exception $e) {
             $this->response([
                 'status' => 'error',
                 'message' => $e->getMessage()
